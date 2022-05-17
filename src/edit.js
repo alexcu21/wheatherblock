@@ -29,9 +29,12 @@ import './editor.scss';
  *
  * @return {WPElement} Element to render.
  */
+
+
 export default function Edit() {
+	const blockProps = useBlockProps()
 	return (
-		<p {...useBlockProps()}>
+		<p {...blockProps}>
 			{__('Weather Block – hello from the editor!', 'weatherblock')}
 		</p>
 	);
