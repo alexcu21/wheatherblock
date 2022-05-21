@@ -7,6 +7,11 @@
 	"category": "widgets",
 	"icon": "smiley",
 	"description": "Example static block scaffolded with Create Block tool.",
+	"attributes": {
+		"cityName":{
+			"type": "string"
+		}
+	},
 	"supports": {
 		"html": false
 	},

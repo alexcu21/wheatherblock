@@ -16,5 +16,7 @@
 	},
 	"devDependencies": {
 		"@wordpress/scripts": "^23.0.0"
+	},
+	"dependencies": {
 	}
 }

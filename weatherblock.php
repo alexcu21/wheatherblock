@@ -20,6 +20,7 @@
  *
  * @see https://developer.wordpress.org/reference/functions/register_block_type/
  */
+
 function create_block_weatherblock_block_init() {
 	register_block_type( __DIR__ . '/build', array(
 		'render_callback' => 'render_weather_widget'
@@ -27,8 +28,46 @@ function create_block_weatherblock_block_init() {
 }
 add_action( 'init', 'create_block_weatherblock_block_init' );
 
+function render_weather_widget($attributes, $content, $block){
 
-function render_weather_widget(){
-	$message = '<h3>Hello Weather</h3>';
-	return $message;
+   	$cityname = $attributes['cityName'] ? $attributes['cityName'] : 'managua';
+       
+	//API variables
+    $url = 'https://api.openweathermap.org/data/2.5/weather';
+    $apiKey = '6b1cd5a24a18ee83c55372465790bed5';
+
+    $fullUrl = $url . '?q=' . $cityname . '&appid=' . $apiKey;
+    $response = wp_remote_get($fullUrl);
+
+    if (is_wp_error($response)) {
+		error_log("Error: ". $response->get_error_message());
+		return false;
+	}
+
+    if ($cityname !== ''){
+
+    $body = wp_remote_retrieve_body($response);
+
+	$data = json_decode($body);
+
+
+   $city = $data->name;
+   $temp = $data->main->temp;
+   $cityweather = $data->weather[0]->main;
+
+
+   ob_start();
+    ?>
+        <section class="weather-card">
+        <h3><?php echo esc_html( $city );?></h3>
+        <p>Temperature: <?php echo esc_html( $temp );?> F</p>
+        <p>Weather: <?php echo esc_html( $cityweather );?></p>
+        </section>
+
+
+    <?php
+
+   return ob_get_clean();
+   }
 }
+

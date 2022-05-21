@@ -7,10 +7,10 @@
  *
  * Replace them with your own styles or remove the file completely.
  */
-.wp-block-create-block-weatherblock {
+.wp-block-create-block-weatherblock, .weather-card {
   background-color: #21759b;
   color: #fff;
-  padding: 2px;
+  padding: 2rem;
 }
 
 /*# sourceMappingURL=style-index.css.map*/

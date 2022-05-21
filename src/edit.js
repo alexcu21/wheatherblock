@@ -4,22 +4,9 @@
  * @see https://developer.wordpress.org/block-editor/packages/packages-i18n/
  */
 import { __ } from '@wordpress/i18n';
-
-/**
- * React hook that is used to mark the block wrapper element.
- * It provides all the necessary props like the class name.
- *
- * @see https://developer.wordpress.org/block-editor/packages/packages-block-editor/#useBlockProps
- */
 import { useBlockProps } from '@wordpress/block-editor';
-
-/**
- * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
- * Those files can contain any CSS code that gets applied to the editor.
- *
- * @see https://www.npmjs.com/package/@wordpress/scripts#using-css
- */
 import './editor.scss';
+import { TextControl } from '@wordpress/components';
 
 /**
  * The edit function describes the structure of your block in the context of the
@@ -31,11 +18,23 @@ import './editor.scss';
  */
 
 
-export default function Edit() {
+export default function Edit(props) {
+
+	const { attributes, setAttributes } = props
+
+	const { cityName } = attributes
+
 	const blockProps = useBlockProps()
+
 	return (
-		<p {...blockProps}>
-			{__('Weather Block – hello from the editor!', 'weatherblock')}
-		</p>
+		<div {...blockProps}>
+			<h3>The Weather at:</h3>
+			<TextControl
+				label="insert your city name"
+				value={cityName}
+				onChange={(newCityName) => setAttributes({ cityName: newCityName})}
+			/>	
+
+		</div>
 	);
 }
