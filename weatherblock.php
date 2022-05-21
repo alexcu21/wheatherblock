@@ -53,7 +53,9 @@ function render_weather_widget($attributes, $content, $block){
 
    $city = $data->name;
    $temp = $data->main->temp;
-   $cityweather = $data->weather[0]->main;
+   $cityweather = $data->weather[0]->description;
+   $weatherIcon = $data->weather[0]->icon;
+
 
 
    ob_start();
@@ -62,6 +64,7 @@ function render_weather_widget($attributes, $content, $block){
         <h3><?php echo esc_html( $city );?></h3>
         <p>Temperature: <?php echo esc_html( $temp );?> F</p>
         <p>Weather: <?php echo esc_html( $cityweather );?></p>
+        <img src="http://openweathermap.org/img/wn/<?php echo $weatherIcon ?>@2x.png" />
         </section>
 
 
