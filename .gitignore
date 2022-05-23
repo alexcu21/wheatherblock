@@ -32,3 +32,5 @@ node_modules/
 #IDE folders
 .idea
 .vscode
+
+artifacts
