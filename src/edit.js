@@ -22,7 +22,7 @@ export default function Edit(props) {
 
 	const { attributes, setAttributes } = props
 
-	const { cityName } = attributes
+	const { cityName, measure } = attributes
 
 	const blockProps = useBlockProps()
 
@@ -34,7 +34,7 @@ export default function Edit(props) {
 				value={cityName}
 				onChange={(newCityName) => setAttributes({ cityName: newCityName})}
 			/>	
-
+			
 		</div>
 	);
 }

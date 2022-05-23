@@ -10,6 +10,9 @@
 	"attributes": {
 		"cityName":{
 			"type": "string"
+		},
+		"measure":{
+			"type": "string"
 		}
 	},
 	"supports": {
