@@ -28,9 +28,9 @@ export default function Edit(props) {
 
 	return (
 		<div {...blockProps}>
-			<h3>The Weather at:</h3>
+			<p>Type the city’s name below, and get the wheather information.</p>
 			<TextControl
-				label="insert your city name"
+				label="City name"
 				value={cityName}
 				onChange={(newCityName) => setAttributes({ cityName: newCityName})}
 			/>	

@@ -31,7 +31,7 @@ add_action( 'init', 'create_block_weatherblock_block_init' );
 function render_weather_widget($attributes, $content, $block){
 
    	$cityname = $attributes['cityName'] ? $attributes['cityName'] : 'managua';
-    $measure = $attributes['measure'] ? $attributes['measure'] : 'Farenheit';
+   
        
 	//API variables
     $url = 'https://api.openweathermap.org/data/2.5/weather';
@@ -40,6 +40,7 @@ function render_weather_widget($attributes, $content, $block){
     $fullUrl = $url . '?q=' . $cityname . '&appid=' . $apiKey;
     $response = wp_remote_get($fullUrl);
 
+   
     if (is_wp_error($response)) {
 		error_log("Error: ". $response->get_error_message());
 		return false;
@@ -55,17 +56,35 @@ function render_weather_widget($attributes, $content, $block){
    $city = $data->name;
    $temp = $data->main->temp;
    $cityweather = $data->weather[0]->description;
+   $hummidity = $data->main->humidity;
+   $speed = $data->wind->speed;
    $weatherIcon = $data->weather[0]->icon;
 
-
-
+  
    ob_start();
     ?>
         <section class="weather-card">
-        <h3><?php echo esc_html( $city );?></h3>
-        <p>Temperature: <?php echo esc_html( $temp ). ' ' . $measure;?> </p>
-        <p>Weather: <?php echo esc_html( $cityweather );?></p>
-        <img src="http://openweathermap.org/img/wn/<?php echo $weatherIcon ?>@2x.png" />
+            <div class="main-weather">
+                <div class="city">
+                    <h3><?php echo esc_html( $city );?></h3>
+                    <p> <?php echo esc_html( $cityweather );?></p>
+                </div>
+                <div class="weather-icon">
+                    <img src="http://openweathermap.org/img/wn/<?php echo $weatherIcon ?>@2x.png" />
+                </div>
+            </div>
+            
+            <div class="temp-info">
+                <p class="temp"> <span><?php echo esc_html( $temp )?></span> F </p>         
+                <div class="humidity">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . 'assets/humidity.png'  ?>"/>
+                    <p><?php echo esc_html($hummidity ) . ' ' . '%'; ?></p>
+                </div>
+               <div class="wind">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . 'assets/wind.png'  ?>"/>
+                    <p><?php echo esc_html($speed ) . ' ' . 'mi/h'; ?></p>
+               </div>
+            </div>
         </section>
 
 
