@@ -1,13 +1,31 @@
-import { createNewPost, insertBlock } from '@wordpress/e2e-test-utils'
 
-describe('Weather Block testing', () => {
+
+import { createNewPost, insertBlock, wpDataSelect, enablePageDialogAccept, getEditedPostContent, getCurrentPostContent } from '@wordpress/e2e-test-utils'
+
+jest.setTimeout(30000)
+
+describe('Pruebas en bloqueclima', () => {
+    beforeAll( async () => {
+        await enablePageDialogAccept();
+    })
     
-    it('Should insert the block in the editor', async () => {
-
+    beforeEach( async () => {
         await createNewPost()
-        await insertBlock( 'Weather Block' );
+    })
+
+    it('deberia insertar el bloque en el editor', async () => {
+
         
-	    expect( await page.$( '[data-type="create-block/weatherblock"]' ) ).not.toBeNull();
+        await insertBlock( 'Bloqueclima' );
+        
+	    expect(await page.$( '[data-type="create-block/bloqueclima"]' ) ).not.toBeNull();
+
+        console.log(await wpDataSelect())
+
+        expect ( await getEditedPostContent() ).toEqual('<!-- wp:create-block/bloqueclima /-->')
 	
     })
+
+    
+
 })

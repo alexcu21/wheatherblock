@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
 import './editor.scss';
 import { TextControl } from '@wordpress/components';
+import {CityNameInput} from 'components/CityNameInput'
 
 /**
  * The edit function describes the structure of your block in the context of the
@@ -22,19 +23,29 @@ export default function Edit(props) {
 
 	const { attributes, setAttributes } = props
 
-	const { cityName, measure } = attributes
+	const { cityName } = attributes
+
+	const onChangeBackColor = (color) => {
+		setAttributes({background_color: color})
+	}
 
 	const blockProps = useBlockProps()
 
 	return (
 		<div {...blockProps}>
-			<p>Type the city’s name below, and get the wheather information.</p>
-			<TextControl
-				label="City name"
-				value={cityName}
-				onChange={(newCityName) => setAttributes({ cityName: newCityName})}
-			/>	
-			
+			<InspectorControls>
+				<ColorPalette
+					 onChange={ onChangeBackColor }
+				/>
+			</InspectorControls>
+			<div className='wrapper' style={{backgroundColor: attributes.bg_color}} >
+				<p>Type the city’s name below, and get the wheather information.</p>
+				<CityNameInput
+					label="City's Name"
+					value={cityName}
+					onChange={(newCityName) => setAttributes({ cityName: newCityName})}
+				/>
+			</div>
 		</div>
 	);
 }

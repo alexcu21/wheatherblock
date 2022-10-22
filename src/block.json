@@ -11,9 +11,10 @@
 		"cityName":{
 			"type": "string"
 		},
-		"measure":{
-			"type": "string"
-		}
+		"background_color": { 
+			"type": "string", 
+			"default": "#cdcdcd"
+		 }
 	},
 	"supports": {
 		"html": false
