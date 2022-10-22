@@ -34,9 +34,14 @@ export default function Edit(props) {
 	return (
 		<div {...blockProps}>
 			<InspectorControls>
+				<fieldset>
+					<legend>
+						Color de fondo
+					</legend>
 				<ColorPalette
 					 onChange={ onChangeBackColor }
 				/>
+				</fieldset>
 			</InspectorControls>
 			<div className='wrapper' style={{backgroundColor: attributes.bg_color}} >
 				<p>Type the city’s name below, and get the wheather information.</p>
