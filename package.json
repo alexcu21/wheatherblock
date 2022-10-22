@@ -14,7 +14,8 @@
 		"plugin-zip": "wp-scripts plugin-zip",
 		"start": "wp-scripts start",
 		"test:e2e": "wp-scripts test-e2e",
-		"env:start": "wp-env start"
+		"env:start": "wp-env start",
+		"env:stop": " wp-env start"
 	},
 	"devDependencies": {
 		"@wordpress/e2e-test-utils": "^7.5.0",

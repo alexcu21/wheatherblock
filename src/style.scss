@@ -6,7 +6,37 @@
  */
 
 .wp-block-create-block-weatherblock, .weather-card {
-	background-color: #21759b;
-	color: #fff;
+	border-radius: 2rem;
+	box-shadow: 5px 10px 8px #888888;
+	background-color: #dedbd9;
+	color: #000000;
 	padding: 2rem;
+	.main-weather{
+		display: flex;
+		justify-content: space-evenly;
+		h3{	
+			font-size: 3.5rem;
+			font-weight: 900;
+			margin-bottom: 0;
+		}
+		.weather-icon{
+			display: flex;
+			align-items: center;
+		}
+	}
+	.temp-info{
+		display: grid;
+    	grid-template-columns: repeat(3, 1fr);
+		justify-items: center;
+		img{width: 20%;}
+		span{
+			font-size: 3rem;
+		}
+		.humidity, .wind{
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		}
+	}
 }
