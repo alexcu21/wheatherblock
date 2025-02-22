@@ -1,0 +1,48 @@
+/*!***************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[3].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[3].use[2]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[3].use[3]!./src/style.scss ***!
+  \***************************************************************************************************************************************************************************************************************************************/
+/**
+ * The following styles get applied both on the front of your site
+ * and in the editor.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
+.wp-block-create-block-weatherblock, .weather-card {
+  border-radius: 2rem;
+  box-shadow: 5px 10px 8px #888888;
+  background-color: #dedbd9;
+  color: #000000;
+  padding: 2rem;
+}
+.wp-block-create-block-weatherblock .main-weather, .weather-card .main-weather {
+  display: flex;
+  justify-content: space-evenly;
+}
+.wp-block-create-block-weatherblock .main-weather h3, .weather-card .main-weather h3 {
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin-bottom: 0;
+}
+.wp-block-create-block-weatherblock .main-weather .weather-icon, .weather-card .main-weather .weather-icon {
+  display: flex;
+  align-items: center;
+}
+.wp-block-create-block-weatherblock .temp-info, .weather-card .temp-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  justify-items: center;
+}
+.wp-block-create-block-weatherblock .temp-info img, .weather-card .temp-info img {
+  width: 20%;
+}
+.wp-block-create-block-weatherblock .temp-info span, .weather-card .temp-info span {
+  font-size: 3rem;
+}
+.wp-block-create-block-weatherblock .temp-info .humidity, .wp-block-create-block-weatherblock .temp-info .wind, .weather-card .temp-info .humidity, .weather-card .temp-info .wind {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/*# sourceMappingURL=style-index.css.map*/
