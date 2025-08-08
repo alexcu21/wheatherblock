@@ -5,14 +5,15 @@
   "version": "0.1.0",
   "title": "Weather Block",
   "category": "widgets",
-  "icon": "smiley",
-  "description": "Example static block scaffolded with Create Block tool.",
+  "icon": "cloud",
+  "description": "Block with city name, city weather, city temperature and city weather icon",
   "attributes": {
     "cityName": {
       "type": "string"
     },
-    "measure": {
-      "type": "string"
+    "background_color": {
+      "type": "string",
+      "default": "#cdcdcd"
     }
   },
   "supports": {

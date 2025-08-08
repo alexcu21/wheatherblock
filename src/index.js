@@ -8,7 +8,6 @@ import './style.scss';
 import Edit from './edit';
 import name from './block.json';
 
-
 registerBlockType( name, {
 	/**
 	 * @see ./edit.js
@@ -33,20 +32,5 @@ registerBlockType( name, {
 		],
 
 	},
-
-	// transforms: {
-	// 	from: [
-	// 		{
-	// 			type: 'block',
-	// 			blocks:['core/shortcode'],
-	// 			transform({attributes: {cityname}}){
-	// 				return createBlock('create-block/weatherblock', {
-	// 					cityName: cityname
-	// 				})
-	// 			}
-	// 		},
-	// 	],
-
-	// },
 	
 });

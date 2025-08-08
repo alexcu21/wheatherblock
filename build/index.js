@@ -2,6 +2,44 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./src/components/CityNameInput.js":
+/*!*****************************************!*\
+  !*** ./src/components/CityNameInput.js ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
+/* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
+
+
+
+const CityNameInput = props => {
+  const {
+    label,
+    value,
+    onChange,
+    type = 'text'
+  } = props;
+
+  const onChangeValue = event => onChange(event.target.value);
+
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("label", null, label), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("br", null), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("input", {
+    type: type,
+    value: value,
+    onChange: onChangeValue
+  }));
+};
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (CityNameInput);
+
+/***/ }),
+
 /***/ "./src/edit.js":
 /*!*********************!*\
   !*** ./src/edit.js ***!
@@ -21,6 +59,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _editor_scss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./editor.scss */ "./src/editor.scss");
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @wordpress/components */ "@wordpress/components");
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _components_CityNameInput__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/CityNameInput */ "./src/components/CityNameInput.js");
 
 
 /**
@@ -28,6 +67,7 @@ __webpack_require__.r(__webpack_exports__);
  *
  * @see https://developer.wordpress.org/block-editor/packages/packages-i18n/
  */
+
 
 
 
@@ -47,17 +87,30 @@ function Edit(props) {
     setAttributes
   } = props;
   const {
-    cityName,
-    measure
+    cityName
   } = attributes;
+
+  const onChangeBackColor = color => {
+    setAttributes({
+      background_color: color
+    });
+  };
+
   const blockProps = (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps)();
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", blockProps, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "Type the city\u2019s name below, and get the wheather information."), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.TextControl, {
-    label: "City name",
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", blockProps, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.InspectorControls, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("legend", null, "Color de fondo"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.ColorPalette, {
+    onChange: onChangeBackColor
+  }))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "wrapper",
+    style: {
+      backgroundColor: attributes.bg_color
+    }
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "Type the city\u2019s name below, and get the wheather information."), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_components_CityNameInput__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    label: "City's Name",
     value: cityName,
     onChange: newCityName => setAttributes({
       cityName: newCityName
     })
-  }));
+  })));
 }
 
 /***/ }),
@@ -91,7 +144,25 @@ __webpack_require__.r(__webpack_exports__);
   /**
    * @see ./save.js
    */
-  save: () => null
+  save: () => null,
+  transforms: {
+    from: [{
+      type: 'shortcode',
+      tag: 'weather',
+
+      transform(_ref) {
+        let {
+          attributes: {
+            cityname
+          }
+        } = _ref;
+        return createBlock('create-block/weatherblock', {
+          cityName: cityname
+        });
+      }
+
+    }]
+  }
 });
 
 /***/ }),
@@ -117,6 +188,16 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 // extracted by mini-css-extract-plugin
 
+
+/***/ }),
+
+/***/ "react":
+/*!************************!*\
+  !*** external "React" ***!
+  \************************/
+/***/ ((module) => {
+
+module.exports = window["React"];
 
 /***/ }),
 
@@ -176,7 +257,7 @@ module.exports = window["wp"]["i18n"];
   \************************/
 /***/ ((module) => {
 
-module.exports = JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":2,"name":"create-block/weatherblock","version":"0.1.0","title":"Weather Block","category":"widgets","icon":"smiley","description":"Example static block scaffolded with Create Block tool.","attributes":{"cityName":{"type":"string"},"measure":{"type":"string"}},"supports":{"html":false},"textdomain":"weatherblock","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css"}');
+module.exports = JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":2,"name":"create-block/weatherblock","version":"0.1.0","title":"Weather Block","category":"widgets","icon":"cloud","description":"Block with city name, city weather, city temperature and city weather icon","attributes":{"cityName":{"type":"string"},"background_color":{"type":"string","default":"#cdcdcd"}},"supports":{"html":false},"textdomain":"weatherblock","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css"}');
 
 /***/ })
 

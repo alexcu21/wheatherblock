@@ -4,10 +4,10 @@
  * @see https://developer.wordpress.org/block-editor/packages/packages-i18n/
  */
 import { __ } from '@wordpress/i18n';
-import { useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import './editor.scss';
-import { TextControl } from '@wordpress/components';
-import {CityNameInput} from 'components/CityNameInput'
+import { TextControl, ColorPalette } from '@wordpress/components';
+import CityNameInput from './components/CityNameInput'
 
 /**
  * The edit function describes the structure of your block in the context of the
