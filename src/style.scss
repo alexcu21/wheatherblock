@@ -2,41 +2,359 @@
  * The following styles get applied both on the front of your site
  * and in the editor.
  *
- * Replace them with your own styles or remove the file completely.
+ * Interactive Weather Block Styles with WordPress Interactivity API support
  */
 
-.wp-block-create-block-weatherblock, .weather-card {
+.wp-block-create-block-weatherblock {
+	background-color: #f0f8ff;
+	color: #333;
+	padding: 20px;
+	border-radius: 12px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+	.weatherblock-container {
+		max-width: 500px;
+		margin: 0 auto;
+	}
+
+	// City Input Section
+	.city-input-section {
+		margin-bottom: 20px;
+
+		label {
+			display: block;
+			margin-bottom: 8px;
+			font-weight: 600;
+			color: #2c3e50;
+		}
+
+		.input-group {
+			display: flex;
+			gap: 10px;
+
+			input {
+				flex: 1;
+				padding: 12px;
+				border: 2px solid #e1e8ed;
+				border-radius: 8px;
+				font-size: 16px;
+				transition: border-color 0.3s ease;
+
+				&:focus {
+					outline: none;
+					border-color: #3498db;
+					box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+				}
+
+				&::placeholder {
+					color: #95a5a6;
+				}
+			}
+
+			button {
+				padding: 12px 20px;
+				background: linear-gradient(135deg, #3498db, #2980b9);
+				color: white;
+				border: none;
+				border-radius: 8px;
+				font-size: 16px;
+				font-weight: 600;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				min-width: 120px;
+
+				&:hover:not(:disabled) {
+					background: linear-gradient(135deg, #2980b9, #1f4e79);
+					transform: translateY(-1px);
+					box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+				}
+
+				&:disabled {
+					background: #bdc3c7;
+					cursor: not-allowed;
+					transform: none;
+				}
+			}
+		}
+	}
+
+	// Loading State
+	.loading-state {
+		text-align: center;
+		padding: 40px 20px;
+		color: #7f8c8d;
+
+		.loading-spinner {
+			width: 40px;
+			height: 40px;
+			border: 4px solid #ecf0f1;
+			border-top: 4px solid #3498db;
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+			margin: 0 auto 16px;
+		}
+
+		p {
+			margin: 0;
+			font-style: italic;
+		}
+	}
+
+	// Error State
+	.error-state {
+		background: #e74c3c;
+		color: white;
+		padding: 16px;
+		border-radius: 8px;
+		margin: 16px 0;
+		text-align: center;
+
+		p {
+			margin: 0;
+			font-weight: 600;
+		}
+	}
+
+	// Weather Display
+	.weather-display {
+		.weather-card {
+			background: rgba(255, 255, 255, 0.9);
+			border-radius: 12px;
+			padding: 24px;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+			margin-bottom: 20px;
+
+			.main-weather {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 24px;
+
+				.city-info {
+					h3 {
+						margin: 0 0 8px 0;
+						font-size: 24px;
+						font-weight: 700;
+						color: #2c3e50;
+						text-transform: capitalize;
+					}
+
+					p {
+						margin: 0;
+						font-size: 16px;
+						color: #7f8c8d;
+						text-transform: capitalize;
+					}
+				}
+
+				.weather-icon img {
+					width: 64px;
+					height: 64px;
+					filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+				}
+			}
+
+			.weather-details {
+				.temperature {
+					text-align: center;
+					margin-bottom: 20px;
+
+					.temp-value {
+						font-size: 48px;
+						font-weight: 300;
+						color: #2c3e50;
+					}
+
+					.temp-unit {
+						font-size: 24px;
+						color: #7f8c8d;
+						margin-left: 4px;
+					}
+				}
+
+				.weather-stats {
+					display: flex;
+					justify-content: space-around;
+					gap: 20px;
+
+					.stat-item {
+						display: flex;
+						align-items: center;
+						gap: 8px;
+						background: #ecf0f1;
+						padding: 12px 16px;
+						border-radius: 8px;
+						flex: 1;
+						justify-content: center;
+
+						img {
+							width: 24px;
+							height: 24px;
+							opacity: 0.8;
+						}
+
+						span {
+							font-weight: 600;
+							color: #2c3e50;
+						}
+					}
+				}
+			}
+		}
+
+		.weather-controls {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			background: rgba(255, 255, 255, 0.7);
+			padding: 16px;
+			border-radius: 8px;
+
+			.auto-refresh-btn {
+				padding: 8px 16px;
+				background: #95a5a6;
+				color: white;
+				border: none;
+				border-radius: 6px;
+				font-size: 14px;
+				cursor: pointer;
+				transition: all 0.3s ease;
+
+				&:hover {
+					background: #7f8c8d;
+				}
+
+				&.active {
+					background: #e74c3c;
+
+					&:hover {
+						background: #c0392b;
+					}
+				}
+			}
+
+			.last-updated {
+				font-size: 12px;
+				color: #7f8c8d;
+
+				small {
+					font-style: italic;
+				}
+			}
+		}
+	}
+
+	// Editor specific styles
+	.editor-preview {
+		border: 2px dashed #3498db;
+		padding: 20px;
+		border-radius: 8px;
+		margin-top: 16px;
+
+		.editor-weather-preview {
+			margin-top: 16px;
+			padding: 16px;
+			background: rgba(52, 152, 219, 0.1);
+			border-radius: 6px;
+
+			ul {
+				list-style: none;
+				padding: 0;
+				margin: 8px 0 0 0;
+
+				li {
+					padding: 4px 0;
+					font-size: 14px;
+				}
+			}
+		}
+	}
+
+	// Responsive design
+	@media (max-width: 600px) {
+		padding: 16px;
+
+		.weatherblock-container {
+			max-width: 100%;
+		}
+
+		.city-input-section .input-group {
+			flex-direction: column;
+
+			button {
+				width: 100%;
+			}
+		}
+
+		.weather-display .weather-card {
+			padding: 16px;
+
+			.main-weather {
+				flex-direction: column;
+				text-align: center;
+				gap: 16px;
+			}
+
+			.weather-details .weather-stats {
+				flex-direction: column;
+			}
+		}
+
+		.weather-controls {
+			flex-direction: column;
+			gap: 12px;
+			text-align: center;
+		}
+	}
+}
+
+// Legacy weather card styles (for backward compatibility)
+.weather-card {
 	border-radius: 2rem;
 	box-shadow: 5px 10px 8px #888888;
 	background-color: #dedbd9;
 	color: #000000;
 	padding: 2rem;
-	.main-weather{
+	
+	.main-weather {
 		display: flex;
 		justify-content: space-evenly;
-		h3{	
+		
+		h3 {	
 			font-size: 3.5rem;
 			font-weight: 900;
 			margin-bottom: 0;
 		}
-		.weather-icon{
+		
+		.weather-icon {
 			display: flex;
 			align-items: center;
 		}
 	}
-	.temp-info{
+	
+	.temp-info {
 		display: grid;
     	grid-template-columns: repeat(3, 1fr);
 		justify-items: center;
-		img{width: 20%;}
-		span{
+		
+		img { width: 20%; }
+		
+		span {
 			font-size: 3rem;
 		}
-		.humidity, .wind{
+		
+		.humidity, .wind {
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
 		}
 	}
+}
+
+// Keyframe animations
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
 }

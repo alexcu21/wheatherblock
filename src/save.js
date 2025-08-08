@@ -22,13 +22,132 @@ import { useBlockProps } from '@wordpress/block-editor';
  *
  * @return {WPElement} Element to render.
  */
-export default function save() {
+export default function save({ attributes }) {
+	const { cityName, background_color, autoRefresh } = attributes;
+	const blockProps = useBlockProps.save();
+
 	return (
-		<p {...useBlockProps.save()}>
-			{__(
-				'Weather Block – hello from the saved content!',
-				'weatherblock'
-			)}
-		</p>
+		<div 
+			{...blockProps}
+			data-wp-interactive="weatherblock"
+			data-wp-context={JSON.stringify({ 
+				initialCity: cityName || 'managua',
+				autoRefresh: autoRefresh || false 
+			})}
+			style={{ backgroundColor: background_color }}
+		>
+			<div className="weatherblock-container">
+				{/* City Input Section */}
+				<div className="city-input-section">
+					<form data-wp-on--submit="actions.handleCitySubmit">
+						<label htmlFor="city-input">
+							{__('Enter City Name:', 'weatherblock')}
+						</label>
+						<div className="input-group">
+							<input 
+								id="city-input"
+								type="text"
+								placeholder={__('Enter city name...', 'weatherblock')}
+								data-wp-on--input="actions.updateCityName"
+								data-wp-on--keypress="actions.handleKeyPress"
+								data-wp-bind--value="state.cityName"
+							/>
+							<button 
+								type="submit"
+								data-wp-bind--disabled="state.isLoading"
+							>
+								<span data-wp-text="state.isLoading ? 'Loading...' : 'Get Weather'"></span>
+							</button>
+						</div>
+					</form>
+				</div>
+
+				{/* Loading State */}
+				<div 
+					className="loading-state"
+					data-wp-bind--hidden="!state.isLoading"
+				>
+					<div className="loading-spinner"></div>
+					<p>{__('Loading weather data...', 'weatherblock')}</p>
+				</div>
+
+				{/* Error State */}
+				<div 
+					className="error-state"
+					data-wp-bind--hidden="!state.error"
+				>
+					<p data-wp-text="state.error"></p>
+				</div>
+
+				{/* Weather Data Display */}
+				<div 
+					className="weather-display"
+					data-wp-bind--hidden="!state.weatherData"
+				>
+					<div className="weather-card">
+						<div className="main-weather">
+							<div className="city-info">
+								<h3 data-wp-text="state.weatherData?.city || 'Unknown City'"></h3>
+								<p data-wp-text="state.weatherData?.description || 'No description'"></p>
+							</div>
+							<div className="weather-icon">
+								<img 
+									data-wp-bind--src="state.weatherData?.icon_url || ''"
+									data-wp-bind--alt="state.weatherData?.description || 'Weather icon'"
+									width="64"
+									height="64"
+								/>
+							</div>
+						</div>
+						
+						<div className="weather-details">
+							<div className="temperature">
+								<span className="temp-value" data-wp-text="state.weatherData?.temperature || 'N/A'"></span>
+								<span className="temp-unit">°F</span>
+							</div>
+							
+							<div className="weather-stats">
+								<div className="stat-item">
+									<img 
+										src="/wp-content/plugins/wheatherblock/assets/humidity.png" 
+										alt="Humidity" 
+										width="24" 
+										height="24"
+									/>
+									<span data-wp-text="(state.weatherData?.humidity || 'N/A') + ' %'"></span>
+								</div>
+								<div className="stat-item">
+									<img 
+										src="/wp-content/plugins/wheatherblock/assets/wind.png" 
+										alt="Wind Speed" 
+										width="24" 
+										height="24"
+									/>
+									<span data-wp-text="(state.weatherData?.wind_speed || 'N/A') + ' mi/h'"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					{/* Weather Controls */}
+					<div className="weather-controls">
+						<button 
+							className="auto-refresh-btn"
+							data-wp-on--click="actions.toggleAutoRefresh"
+							data-wp-bind--class="state.autoRefresh ? 'active' : ''"
+						>
+							<span data-wp-text="state.autoRefresh ? 'Stop Auto Refresh' : 'Start Auto Refresh'"></span>
+						</button>
+						
+						<div className="last-updated">
+							<small>
+								{__('Last updated: ', 'weatherblock')}
+								<span data-wp-text="state.lastUpdated || 'Never'"></span>
+							</small>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	);
 }

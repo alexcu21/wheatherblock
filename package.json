@@ -17,6 +17,9 @@
 		"env:start": "wp-env start",
 		"env:stop": " wp-env start"
 	},
+	"dependencies": {
+		"@wordpress/interactivity": "^6.5.0"
+	},
 	"devDependencies": {
 		"@wordpress/e2e-test-utils": "^7.5.0",
 		"@wordpress/e2e-tests": "^4.3.0",

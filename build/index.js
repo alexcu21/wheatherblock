@@ -87,7 +87,10 @@ function Edit(props) {
     setAttributes
   } = props;
   const {
-    cityName
+    cityName,
+    background_color,
+    autoRefresh,
+    refreshInterval
   } = attributes;
 
   const onChangeBackColor = color => {
@@ -97,20 +100,46 @@ function Edit(props) {
   };
 
   const blockProps = (0,_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.useBlockProps)();
-  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", blockProps, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.InspectorControls, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("legend", null, "Color de fondo"), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.ColorPalette, {
-    onChange: onChangeBackColor
+  return (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", blockProps, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_2__.InspectorControls, null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.PanelBody, {
+    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Background Settings', 'weatherblock'),
+    initialOpen: true
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("fieldset", null, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("legend", null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Background Color', 'weatherblock')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.ColorPalette, {
+    onChange: onChangeBackColor,
+    value: background_color
+  }))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.PanelBody, {
+    title: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Auto Refresh Settings', 'weatherblock'),
+    initialOpen: false
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.ToggleControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Enable Auto Refresh', 'weatherblock'),
+    help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Automatically refresh weather data at set intervals', 'weatherblock'),
+    checked: autoRefresh,
+    onChange: value => setAttributes({
+      autoRefresh: value
+    })
+  }), autoRefresh && (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_4__.RangeControl, {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Refresh Interval (seconds)', 'weatherblock'),
+    value: refreshInterval,
+    onChange: value => setAttributes({
+      refreshInterval: value
+    }),
+    min: 60,
+    max: 1800,
+    step: 30,
+    help: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('How often to refresh the weather data (60-1800 seconds)', 'weatherblock')
   }))), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     className: "wrapper",
     style: {
-      backgroundColor: attributes.bg_color
+      backgroundColor: background_color
     }
-  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, "Type the city\u2019s name below, and get the wheather information."), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_components_CityNameInput__WEBPACK_IMPORTED_MODULE_5__["default"], {
-    label: "City's Name",
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("h3", null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Interactive Weather Block', 'weatherblock')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", null, (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('This block will display real-time weather data with interactive features on the frontend.', 'weatherblock')), (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "editor-preview"
+  }, (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.createElement)(_components_CityNameInput__WEBPACK_IMPORTED_MODULE_5__["default"], {
+    label: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)("Default City Name", 'weatherblock'),
     value: cityName,
     onChange: newCityName => setAttributes({
       cityName: newCityName
     })
-  })));
+  }))));
 }
 
 /***/ }),
@@ -257,7 +286,7 @@ module.exports = window["wp"]["i18n"];
   \************************/
 /***/ ((module) => {
 
-module.exports = JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":2,"name":"create-block/weatherblock","version":"0.1.0","title":"Weather Block","category":"widgets","icon":"cloud","description":"Block with city name, city weather, city temperature and city weather icon","attributes":{"cityName":{"type":"string"},"background_color":{"type":"string","default":"#cdcdcd"}},"supports":{"html":false},"textdomain":"weatherblock","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css"}');
+module.exports = JSON.parse('{"$schema":"https://schemas.wp.org/trunk/block.json","apiVersion":2,"name":"create-block/weatherblock","version":"0.1.0","title":"Weather Block","category":"widgets","icon":"cloud","description":"Interactive weather block with real-time data and auto-refresh","attributes":{"cityName":{"type":"string","default":"managua"},"background_color":{"type":"string","default":"#cdcdcd"},"autoRefresh":{"type":"boolean","default":false},"refreshInterval":{"type":"number","default":300}},"supports":{"html":false,"interactivity":true},"textdomain":"weatherblock","editorScript":"file:./index.js","editorStyle":"file:./index.css","style":"file:./style-index.css","viewScript":"file:./view.js"}');
 
 /***/ })
 

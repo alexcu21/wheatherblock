@@ -64,6 +64,108 @@ function weatherblock_register_settings() {
 add_action( 'admin_init', 'weatherblock_register_settings' );
 
 /**
+ * Register post meta for block bindings.
+ */
+function weatherblock_register_post_meta() {
+	register_meta(
+		'post',
+		'weatherblock_city_name',
+		array(
+			'show_in_rest' => true,
+			'single'       => true,
+			'type'         => 'string',
+			'label'        => __( 'Weather Block City Name', 'weatherblock' ),
+		)
+	);
+	
+	register_meta(
+		'post',
+		'weatherblock_auto_refresh',
+		array(
+			'show_in_rest' => true,
+			'single'       => true,
+			'type'         => 'boolean',
+			'label'        => __( 'Auto Refresh Weather', 'weatherblock' ),
+			'default'      => false,
+		)
+	);
+}
+add_action( 'init', 'weatherblock_register_post_meta' );
+
+/**
+ * Register custom block bindings sources.
+ */
+function weatherblock_register_bindings_sources() {
+	// Weather data source
+	register_block_bindings_source(
+		'weatherblock/weather-data',
+		array(
+			'label'              => __( 'Weather Data', 'weatherblock' ),
+			'get_value_callback' => 'weatherblock_get_weather_data',
+			'uses_context'       => array( 'postId' ),
+		)
+	);
+	
+	// City name source
+	register_block_bindings_source(
+		'weatherblock/city-name',
+		array(
+			'label'              => __( 'City Name', 'weatherblock' ),
+			'get_value_callback' => 'weatherblock_get_city_name',
+			'uses_context'       => array( 'postId' ),
+		)
+	);
+}
+add_action( 'init', 'weatherblock_register_bindings_sources' );
+
+/**
+ * Get weather data for block bindings.
+ */
+function weatherblock_get_weather_data( $source_args, $block_instance ) {
+	$city_name = isset( $source_args['city'] ) ? $source_args['city'] : 'managua';
+	$api_key   = get_option( 'weatherblock_api_key', '' );
+	
+	if ( empty( $api_key ) ) {
+		return array(
+			'temperature'  => 'N/A',
+			'description'  => 'API not configured',
+			'humidity'     => 'N/A',
+			'wind_speed'   => 'N/A',
+		);
+	}
+	
+	// Fetch weather data (reuse existing logic)
+	$url      = 'https://api.openweathermap.org/data/2.5/weather';
+	$full_url = $url . '?q=' . $city_name . '&appid=' . $api_key;
+	$response = wp_remote_get( $full_url );
+	
+	if ( is_wp_error( $response ) ) {
+		return array(
+			'temperature'  => 'Error',
+			'description'  => 'Data unavailable',
+			'humidity'     => 'N/A',
+			'wind_speed'   => 'N/A',
+		);
+	}
+	
+	$data = json_decode( wp_remote_retrieve_body( $response ) );
+	
+	return array(
+		'temperature'  => $data->main->temp ?? 'N/A',
+		'description'  => $data->weather[0]->description ?? 'N/A',
+		'humidity'     => $data->main->humidity ?? 'N/A',
+		'wind_speed'   => $data->wind->speed ?? 'N/A',
+	);
+}
+
+/**
+ * Get city name for block bindings.
+ */
+function weatherblock_get_city_name( $source_args, $block_instance ) {
+	return isset( $source_args['default'] ) ? $source_args['default'] : 'managua';
+}
+
+/**
  * API section callback.
  */
 function weatherblock_api_section_callback() {
@@ -169,6 +271,82 @@ function create_block_weatherblock_block_init() {
 	);
 }
 add_action( 'init', 'create_block_weatherblock_block_init' );
+
+/**
+ * Register REST API routes.
+ */
+function weatherblock_register_rest_routes() {
+	register_rest_route(
+		'weatherblock/v1',
+		'/weather',
+		array(
+			'methods'             => 'GET',
+			'callback'            => 'weatherblock_get_weather_rest',
+			'permission_callback' => '__return_true',
+			'args'                => array(
+				'city' => array(
+					'required'          => true,
+					'sanitize_callback' => 'sanitize_text_field',
+				),
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'weatherblock_register_rest_routes' );
+
+/**
+ * REST API callback for weather data.
+ */
+function weatherblock_get_weather_rest( $request ) {
+	$city    = $request->get_param( 'city' );
+	$api_key = get_option( 'weatherblock_api_key', '' );
+	
+	if ( empty( $api_key ) ) {
+		return new WP_Error( 'no_api_key', 'API key not configured', array( 'status' => 400 ) );
+	}
+	
+	$url      = 'https://api.openweathermap.org/data/2.5/weather';
+	$full_url = $url . '?q=' . $city . '&appid=' . $api_key;
+	$response = wp_remote_get( $full_url );
+	
+	if ( is_wp_error( $response ) ) {
+		return new WP_Error( 'api_error', 'Failed to fetch weather data', array( 'status' => 500 ) );
+	}
+	
+	$data = json_decode( wp_remote_retrieve_body( $response ) );
+	
+	if ( ! $data || ! isset( $data->name ) ) {
+		return new WP_Error( 'invalid_data', 'Invalid weather data received', array( 'status' => 500 ) );
+	}
+	
+	return array(
+		'success' => true,
+		'data'    => array(
+			'city'        => $data->name,
+			'temperature' => $data->main->temp,
+			'description' => $data->weather[0]->description,
+			'humidity'    => $data->main->humidity,
+			'wind_speed'  => $data->wind->speed,
+			'icon_url'    => 'http://openweathermap.org/img/wn/' . $data->weather[0]->icon . '@2x.png',
+		),
+	);
+}
+
+/**
+ * Enqueue interactive scripts.
+ */
+function weatherblock_enqueue_interactive_scripts() {
+	if ( has_block( 'create-block/weatherblock' ) ) {
+		wp_enqueue_script(
+			'weatherblock-interactive',
+			plugin_dir_url( __FILE__ ) . 'build/view.js',
+			array( 'wp-interactivity' ),
+			'0.1.0',
+			true
+		);
+	}
+}
+add_action( 'wp_enqueue_scripts', 'weatherblock_enqueue_interactive_scripts' );
 
 /**
  * Render callback for the weather widget block.

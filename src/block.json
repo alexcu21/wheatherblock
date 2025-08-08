@@ -6,21 +6,32 @@
 	"title": "Weather Block",
 	"category": "widgets",
 	"icon": "cloud",
-	"description": "Block with city name, city weather, city temperature and city weather icon",
+	"description": "Interactive weather block with real-time data and auto-refresh",
 	"attributes": {
-		"cityName":{
-			"type": "string"
+		"cityName": {
+			"type": "string",
+			"default": "managua"
 		},
 		"background_color": { 
 			"type": "string", 
 			"default": "#cdcdcd"
-		 }
+		},
+		"autoRefresh": {
+			"type": "boolean",
+			"default": false
+		},
+		"refreshInterval": {
+			"type": "number",
+			"default": 300
+		}
 	},
 	"supports": {
-		"html": false
+		"html": false,
+		"interactivity": true
 	},
 	"textdomain": "weatherblock",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css"
+	"style": "file:./style-index.css",
+	"viewScript": "file:./view.js"
 }
