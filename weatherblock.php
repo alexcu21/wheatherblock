@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // ==========================================
-// 1. LÓGICA CENTRAL (HELPER FUNCTIONS)
+// 1. HELPER FUNCTIONS
 // ==========================================
 
 /**
@@ -68,7 +68,7 @@ function weatherblock_fetch_from_api( $city ) {
 }
 
 // ==========================================
-// 2. CONFIGURACIÓN DEL ADMIN
+// 2. ADMIN SETTINGS
 // ==========================================
 
 function weatherblock_admin_menu() {
