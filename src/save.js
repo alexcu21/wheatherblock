@@ -110,7 +110,7 @@ export default function save({ attributes }) {
 								<div className="stat-item">
 									<img 
 										src="/wp-content/plugins/wheatherblock/assets/humidity.png" 
-										alt="Humidity" 
+										alt={__('Humidity', 'weatherblock')}
 										width="24" 
 										height="24"
 									/>
@@ -119,7 +119,7 @@ export default function save({ attributes }) {
 								<div className="stat-item">
 									<img 
 										src="/wp-content/plugins/wheatherblock/assets/wind.png" 
-										alt="Wind Speed" 
+										alt={__('Wind Speed', 'weatherblock')}
 										width="24" 
 										height="24"
 									/>
