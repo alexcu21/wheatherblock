@@ -4,7 +4,7 @@
  * Description:       A simple block that show weather info from Weather API. Refactored for better maintenance.
  * Requires at least: 6.0
  * Requires PHP:      7.4
- * Version:           0.2.0
+ * Version:           0.3.0
  * Author:            Alex Cuadra
  * License:           GPL-2.0-or-later
  * Text Domain:       weatherblock
@@ -29,8 +29,21 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array|WP_Error Array with weather data or WP_Error.
  */
 function weatherblock_fetch_from_api( $city ) {
+    // ----------------------------------------------------------
+    // 1. Check the transient cache first (15-minute TTL per city)
+    // ----------------------------------------------------------
+    $cache_key = 'weatherblock_' . sanitize_key( $city );
+    $cached    = get_transient( $cache_key );
+
+    if ( false !== $cached ) {
+        return $cached; // Return cached data, no API call needed.
+    }
+
+    // ----------------------------------------------------------
+    // 2. Cache miss — fetch from OpenWeatherMap
+    // ----------------------------------------------------------
     $api_key = get_option( 'weatherblock_api_key', '' );
-    
+
     if ( empty( $api_key ) ) {
         return new WP_Error( 'no_api_key', 'Clave API no configurada' );
     }
@@ -38,33 +51,52 @@ function weatherblock_fetch_from_api( $city ) {
     $url      = 'https://api.openweathermap.org/data/2.5/weather';
     // units=imperial is added for consistency (Fahrenheit)
     $full_url = $url . '?q=' . urlencode( $city ) . '&appid=' . $api_key . '&units=imperial';
-    
+
     $response = wp_remote_get( $full_url );
-    
+
     if ( is_wp_error( $response ) ) {
-        return $response;
+        return $response; // Network errors are never cached.
     }
-    
+
     $response_code = wp_remote_retrieve_response_code( $response );
     if ( 200 !== $response_code ) {
         return new WP_Error( 'api_error', 'El proveedor devolvió el error: ' . $response_code );
     }
 
     $data = json_decode( wp_remote_retrieve_body( $response ) );
-    
+
     if ( ! $data || ! isset( $data->name ) ) {
         return new WP_Error( 'invalid_data', 'Datos del clima inválidos recibidos' );
     }
 
-    return array(
+    $result = array(
         'city'        => $data->name,
-        'temperature' => $data->main->temp, // Generally Fahrenheit due to units=imperial
+        'temperature' => $data->main->temp, // Fahrenheit due to units=imperial
         'description' => $data->weather[0]->description,
         'humidity'    => $data->main->humidity,
         'wind_speed'  => $data->wind->speed,
         'icon_code'   => $data->weather[0]->icon,
         'icon_url'    => 'http://openweathermap.org/img/wn/' . $data->weather[0]->icon . '@2x.png',
     );
+
+    // ----------------------------------------------------------
+    // 3. Store successful result in the transient cache
+    //    WP_Error responses are intentionally NOT cached so the
+    //    next request will retry the API automatically.
+    // ----------------------------------------------------------
+    set_transient( $cache_key, $result, 15 * MINUTE_IN_SECONDS );
+
+    return $result;
+}
+
+/**
+ * Clear the transient cache for a specific city.
+ * Useful when an admin changes the API key or wants fresh data.
+ *
+ * @param string $city The city name whose cache should be cleared.
+ */
+function weatherblock_clear_cache( $city ) {
+    delete_transient( 'weatherblock_' . sanitize_key( $city ) );
 }
 
 // ==========================================
