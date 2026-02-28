@@ -18,41 +18,46 @@ import { useBlockProps } from '@wordpress/block-editor';
  * be combined into the final markup, which is then serialized by the block
  * editor into `post_content`.
  *
+ * @param  root0
+ * @param  root0.attributes
  * @see https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/#save
  *
  * @return {WPElement} Element to render.
  */
-export default function save({ attributes }) {
+export default function save( { attributes } ) {
 	const { cityName, background_color, autoRefresh } = attributes;
 	const blockProps = useBlockProps.save();
 
 	return (
-		<div 
-			{...blockProps}
+		<div
+			{ ...blockProps }
 			data-wp-interactive="weatherblock"
-			data-wp-context={JSON.stringify({ 
+			data-wp-context={ JSON.stringify( {
 				initialCity: cityName || 'managua',
-				autoRefresh: autoRefresh || false 
-			})}
-			style={{ backgroundColor: background_color }}
+				autoRefresh: autoRefresh || false,
+			} ) }
+			style={ { backgroundColor: background_color } }
 		>
 			<div className="weatherblock-container">
-				{/* City Input Section */}
+				{ /* City Input Section */ }
 				<div className="city-input-section">
 					<form data-wp-on--submit="actions.handleCitySubmit">
 						<label htmlFor="city-input">
-							{__('Enter City Name:', 'weatherblock')}
+							{ __( 'Enter City Name:', 'weatherblock' ) }
 						</label>
 						<div className="input-group">
-							<input 
+							<input
 								id="city-input"
 								type="text"
-								placeholder={__('Enter city name...', 'weatherblock')}
+								placeholder={ __(
+									'Enter city name…',
+									'weatherblock'
+								) }
 								data-wp-on--input="actions.updateCityName"
 								data-wp-on--keypress="actions.handleKeyPress"
 								data-wp-bind--value="state.cityName"
 							/>
-							<button 
+							<button
 								type="submit"
 								data-wp-bind--disabled="state.isLoading"
 							>
@@ -62,25 +67,25 @@ export default function save({ attributes }) {
 					</form>
 				</div>
 
-				{/* Loading State */}
-				<div 
+				{ /* Loading State */ }
+				<div
 					className="loading-state"
 					data-wp-bind--hidden="!state.isLoading"
 				>
 					<div className="loading-spinner"></div>
-					<p>{__('Loading weather data...', 'weatherblock')}</p>
+					<p>{ __( 'Loading weather data…', 'weatherblock' ) }</p>
 				</div>
 
-				{/* Error State */}
-				<div 
+				{ /* Error State */ }
+				<div
 					className="error-state"
 					data-wp-bind--hidden="!state.error"
 				>
 					<p data-wp-text="state.error"></p>
 				</div>
 
-				{/* Weather Data Display */}
-				<div 
+				{ /* Weather Data Display */ }
+				<div
 					className="weather-display"
 					data-wp-bind--hidden="!state.weatherData"
 				>
@@ -91,7 +96,7 @@ export default function save({ attributes }) {
 								<p data-wp-text="state.weatherData?.description || 'No description'"></p>
 							</div>
 							<div className="weather-icon">
-								<img 
+								<img
 									data-wp-bind--src="state.weatherData?.icon_url || ''"
 									data-wp-bind--alt="state.weatherData?.description || 'Weather icon'"
 									width="64"
@@ -99,28 +104,34 @@ export default function save({ attributes }) {
 								/>
 							</div>
 						</div>
-						
+
 						<div className="weather-details">
 							<div className="temperature">
-								<span className="temp-value" data-wp-text="state.weatherData?.temperature || 'N/A'"></span>
+								<span
+									className="temp-value"
+									data-wp-text="state.weatherData?.temperature || 'N/A'"
+								></span>
 								<span className="temp-unit">°F</span>
 							</div>
-							
+
 							<div className="weather-stats">
 								<div className="stat-item">
-									<img 
-										src="/wp-content/plugins/wheatherblock/assets/humidity.png" 
-										alt={__('Humidity', 'weatherblock')}
-										width="24" 
+									<img
+										src="/wp-content/plugins/wheatherblock/assets/humidity.png"
+										alt={ __( 'Humidity', 'weatherblock' ) }
+										width="24"
 										height="24"
 									/>
 									<span data-wp-text="(state.weatherData?.humidity || 'N/A') + ' %'"></span>
 								</div>
 								<div className="stat-item">
-									<img 
-										src="/wp-content/plugins/wheatherblock/assets/wind.png" 
-										alt={__('Wind Speed', 'weatherblock')}
-										width="24" 
+									<img
+										src="/wp-content/plugins/wheatherblock/assets/wind.png"
+										alt={ __(
+											'Wind Speed',
+											'weatherblock'
+										) }
+										width="24"
 										height="24"
 									/>
 									<span data-wp-text="(state.weatherData?.wind_speed || 'N/A') + ' mi/h'"></span>
@@ -128,20 +139,20 @@ export default function save({ attributes }) {
 							</div>
 						</div>
 					</div>
-					
-					{/* Weather Controls */}
+
+					{ /* Weather Controls */ }
 					<div className="weather-controls">
-						<button 
+						<button
 							className="auto-refresh-btn"
 							data-wp-on--click="actions.toggleAutoRefresh"
 							data-wp-bind--class="state.autoRefresh ? 'active' : ''"
 						>
 							<span data-wp-text="state.autoRefresh ? 'Stop Auto Refresh' : 'Start Auto Refresh'"></span>
 						</button>
-						
+
 						<div className="last-updated">
 							<small>
-								{__('Last updated: ', 'weatherblock')}
+								{ __( 'Last updated: ', 'weatherblock' ) }
 								<span data-wp-text="state.lastUpdated || 'Never'"></span>
 							</small>
 						</div>

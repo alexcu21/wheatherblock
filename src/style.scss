@@ -39,7 +39,7 @@
 				border: 2px solid #e1e8ed;
 				border-radius: 8px;
 				font-size: 16px;
-				transition: border-color 0.3s ease;
+				transition: border-color 0.2s ease;
 
 				&:focus {
 					outline: none;
@@ -61,7 +61,7 @@
 				font-size: 16px;
 				font-weight: 600;
 				cursor: pointer;
-				transition: all 0.3s ease;
+				transition: transform 0.2s ease, background 0.2s ease;
 				min-width: 120px;
 
 				&:hover:not(:disabled) {
@@ -124,6 +124,7 @@
 			padding: 24px;
 			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 			margin-bottom: 20px;
+			contain: layout style paint;
 
 			.main-weather {
 				display: flex;
@@ -219,7 +220,7 @@
 				border-radius: 6px;
 				font-size: 14px;
 				cursor: pointer;
-				transition: all 0.3s ease;
+				transition: background 0.2s ease;
 
 				&:hover {
 					background: #7f8c8d;
@@ -309,49 +310,7 @@
 	}
 }
 
-// Legacy weather card styles (for backward compatibility)
-.weather-card {
-	border-radius: 2rem;
-	box-shadow: 5px 10px 8px #888888;
-	background-color: #dedbd9;
-	color: #000000;
-	padding: 2rem;
-	
-	.main-weather {
-		display: flex;
-		justify-content: space-evenly;
-		
-		h3 {	
-			font-size: 3.5rem;
-			font-weight: 900;
-			margin-bottom: 0;
-		}
-		
-		.weather-icon {
-			display: flex;
-			align-items: center;
-		}
-	}
-	
-	.temp-info {
-		display: grid;
-    	grid-template-columns: repeat(3, 1fr);
-		justify-items: center;
-		
-		img { width: 20%; }
-		
-		span {
-			font-size: 3rem;
-		}
-		
-		.humidity, .wind {
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			align-items: center;
-		}
-	}
-}
+
 
 // Keyframe animations
 @keyframes spin {

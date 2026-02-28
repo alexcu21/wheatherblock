@@ -1,31 +1,34 @@
+import {
+	createNewPost,
+	insertBlock,
+	wpDataSelect,
+	enablePageDialogAccept,
+	getEditedPostContent,
+	getCurrentPostContent,
+} from '@wordpress/e2e-test-utils';
 
+jest.setTimeout( 30000 );
 
-import { createNewPost, insertBlock, wpDataSelect, enablePageDialogAccept, getEditedPostContent, getCurrentPostContent } from '@wordpress/e2e-test-utils'
+describe( 'Pruebas en bloqueclima', () => {
+	beforeAll( async () => {
+		await enablePageDialogAccept();
+	} );
 
-jest.setTimeout(30000)
+	beforeEach( async () => {
+		await createNewPost();
+	} );
 
-describe('Pruebas en bloqueclima', () => {
-    beforeAll( async () => {
-        await enablePageDialogAccept();
-    })
-    
-    beforeEach( async () => {
-        await createNewPost()
-    })
+	it( 'deberia insertar el bloque en el editor', async () => {
+		await insertBlock( 'Bloqueclima' );
 
-    it('deberia insertar el bloque en el editor', async () => {
+		expect(
+			await page.$( '[data-type="create-block/bloqueclima"]' )
+		).not.toBeNull();
 
-        
-        await insertBlock( 'Bloqueclima' );
-        
-	    expect(await page.$( '[data-type="create-block/bloqueclima"]' ) ).not.toBeNull();
+		console.log( await wpDataSelect() );
 
-        console.log(await wpDataSelect())
-
-        expect ( await getEditedPostContent() ).toEqual('<!-- wp:create-block/bloqueclima /-->')
-	
-    })
-
-    
-
-})
+		expect( await getEditedPostContent() ).toEqual(
+			'<!-- wp:create-block/bloqueclima /-->'
+		);
+	} );
+} );

@@ -1,4 +1,4 @@
-import { registerBlockType } from '@wordpress/blocks';
+import { registerBlockType, createBlock } from '@wordpress/blocks';
 import './style.scss';
 
 /**
@@ -22,15 +22,13 @@ registerBlockType( name, {
 		from: [
 			{
 				type: 'shortcode',
-				tag:'weather',
-				transform({attributes: {cityname}}){
-					return createBlock('create-block/weatherblock', {
-						cityName: cityname
-					})
-				}
+				tag: 'weather',
+				transform( { attributes: { cityname } } ) {
+					return createBlock( 'create-block/weatherblock', {
+						cityName: cityname,
+					} );
+				},
 			},
 		],
-
 	},
-	
-});
+} );

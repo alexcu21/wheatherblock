@@ -18,16 +18,51 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // ==========================================
-// 1. LÓGICA CENTRAL (HELPER FUNCTIONS)
+// 1. HELPER FUNCTIONS
 // ==========================================
 
 /**
- * Función auxiliar para obtener datos del clima con caché (Transients API).
+ * Helper function to check rate limiting.
  *
- * @param string $city El nombre de la ciudad.
- * @return array|WP_Error Array con datos del clima o WP_Error.
+ * @param string $ip Client IP address.
+ * @return bool True if rate limited, false otherwise.
+ */
+function weatherblock_is_rate_limited( $ip ) {
+	$rate_limit_key = 'weatherblock_rate_limit_' . md5( $ip );
+	$request_count = get_transient( $rate_limit_key );
+	
+	// Allow 30 requests per hour per IP
+	$limit = apply_filters( 'weatherblock_rate_limit_count', 30 );
+	$window = apply_filters( 'weatherblock_rate_limit_window', HOUR_IN_SECONDS );
+	
+	if ( false === $request_count ) {
+		// First request in window
+		set_transient( $rate_limit_key, 1, $window );
+		return false;
+	}
+	
+	if ( $request_count >= $limit ) {
+		return true; // Rate limited
+	}
+	
+	// Increment request count
+	set_transient( $rate_limit_key, $request_count + 1, $window );
+	return false;
+}
+
+/**
+ * Helper function to fetch weather data from the API with caching (Transients API).
+ *
+ * @param string $city The name of the city.
+ * @return array|WP_Error Array with weather data or WP_Error.
  */
 function weatherblock_fetch_from_api( $city ) {
+	// Check rate limiting first
+	$client_ip = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+	if ( weatherblock_is_rate_limited( $client_ip ) ) {
+		return new WP_Error( 'rate_limited', __( 'Too many requests. Please try again later.', 'weatherblock' ) );
+	}
+	
 	$city          = sanitize_text_field( strtolower( $city ) );
 	$transient_key = 'weather_data_' . md5( $city );
 	$cached_data   = get_transient( $transient_key );
@@ -79,14 +114,15 @@ function weatherblock_fetch_from_api( $city ) {
 		'icon_url'    => 'https://openweathermap.org/img/wn/' . $data->weather[0]->icon . '@2x.png',
 	);
 
-	// Guardar en caché por 15 minutos.
-	set_transient( $transient_key, $weather_data, 15 * MINUTE_IN_SECONDS );
+	// Save in cache - configurable duration with filter
+	$cache_duration = apply_filters( 'weatherblock_cache_duration', 15 * MINUTE_IN_SECONDS, $city );
+	set_transient( $transient_key, $weather_data, $cache_duration );
 
 	return $weather_data;
 }
 
 // ==========================================
-// 2. CONFIGURACIÓN DEL ADMIN
+// 2. ADMIN CONFIGURATION
 // ==========================================
 
 function weatherblock_admin_menu() {
@@ -109,10 +145,13 @@ function weatherblock_register_settings() {
 			'default'           => '',
 		)
 	);
+	
+	// Add cache invalidation hook for API key changes
+	add_action( 'update_option_weatherblock_api_key', 'weatherblock_clear_cache_on_key_change', 10, 2 );
 
 	add_settings_section(
 		'weatherblock_api_section',
-		'Configuración de API',
+		'API Configuration',
 		'weatherblock_api_section_callback',
 		'weatherblock-settings'
 	);
@@ -142,10 +181,26 @@ function weatherblock_api_key_callback() {
 	<?php
 }
 
+/**
+ * Clear weather cache when API key changes.
+ *
+ * @param string $old_value Old API key.
+ * @param string $new_value New API key.
+ */
+function weatherblock_clear_cache_on_key_change( $old_value, $new_value ) {
+	if ( $old_value !== $new_value ) {
+		global $wpdb;
+		// Clear all weather data transients
+		$wpdb->query( 
+			"DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_weather_data_%'" 
+		);
+	}
+}
+
 function weatherblock_settings_page() {
 	?>
 	<div class="wrap">
-		<h1>Configuración de Weather Block</h1>
+		<h1>Weather Block Configuration</h1>
 		<form method="post" action="options.php">
 			<?php
 			settings_fields( 'weatherblock_settings' );
@@ -169,7 +224,7 @@ function weatherblock_register_post_meta() {
 			'show_in_rest' => true,
 			'single'       => true,
 			'type'         => 'string',
-			'label'        => __( 'Nombre de Ciudad para Clima', 'weatherblock' ),
+			'label'        => __( 'City Name for Weather', 'weatherblock' ),
 		)
 	);
 	
@@ -187,21 +242,21 @@ function weatherblock_register_post_meta() {
 add_action( 'init', 'weatherblock_register_post_meta' );
 
 function weatherblock_register_bindings_sources() {
-	// Fuente de datos del clima
+	// Weather data source
 	register_block_bindings_source(
 		'weatherblock/weather-data',
 		array(
-			'label'              => __( 'Datos del Clima', 'weatherblock' ),
+			'label'              => __( 'Weather Data', 'weatherblock' ),
 			'get_value_callback' => 'weatherblock_get_weather_data_binding',
 			'uses_context'       => array( 'postId' ),
 		)
 	);
 	
-	// Fuente del nombre de la ciudad
+	// City name source
 	register_block_bindings_source(
 		'weatherblock/city-name',
 		array(
-			'label'              => __( 'Nombre de Ciudad', 'weatherblock' ),
+			'label'              => __( 'City Name', 'weatherblock' ),
 			'get_value_callback' => 'weatherblock_get_city_name_binding',
 			'uses_context'       => array( 'postId' ),
 		)
@@ -210,13 +265,13 @@ function weatherblock_register_bindings_sources() {
 add_action( 'init', 'weatherblock_register_bindings_sources' );
 
 /**
- * Callback de Block Binding: Usa la función helper centralizada.
+ * Callback for Block Binding: Uses the central helper function.
  */
 function weatherblock_get_weather_data_binding( $source_args, $block_instance ) {
-	// Lógica para determinar la ciudad desde el contexto o argumentos
+	// Logic to determine the city from the context or arguments
 	$city_name = isset( $source_args['city'] ) ? $source_args['city'] : 'managua';
 	
-	// Llamada a la lógica centralizada
+	// Call the central logic
 	$data = weatherblock_fetch_from_api( $city_name );
 
 	if ( is_wp_error( $data ) ) {
@@ -241,7 +296,7 @@ function weatherblock_get_city_name_binding( $source_args, $block_instance ) {
 }
 
 // ==========================================
-// 4. API REST & INICIALIZACIÓN DEL BLOQUE
+// 4. API REST & BLOCK INITIALIZATION
 // ==========================================
 
 function create_block_weatherblock_block_init() {
@@ -253,6 +308,48 @@ function create_block_weatherblock_block_init() {
 	);
 }
 add_action( 'init', 'create_block_weatherblock_block_init' );
+
+/**
+ * Conditional asset loading for better performance
+ */
+function weatherblock_conditional_assets() {
+	// Only load assets if the block is present on the page
+	if ( has_block( 'create-block/weatherblock' ) ) {
+		wp_enqueue_style(
+			'weatherblock-style',
+			plugins_url( 'build/style-index.css', __FILE__ ),
+			array(),
+			filemtime( plugin_dir_path( __FILE__ ) . 'build/style-index.css' )
+		);
+		
+		wp_enqueue_script(
+			'weatherblock-view',
+			plugins_url( 'build/view.js', __FILE__ ),
+			array( 'wp-interactivity' ),
+			filemtime( plugin_dir_path( __FILE__ ) . 'build/view.js' ),
+			true
+		);
+	}
+}
+add_action( 'wp_enqueue_scripts', 'weatherblock_conditional_assets' );
+
+/**
+ * Defer loading of assets in admin
+ */
+function weatherblock_admin_conditional_assets() {
+	global $current_screen;
+	
+	// Only load editor assets when editing posts with blocks
+	if ( $current_screen && $current_screen->is_block_editor ) {
+		wp_enqueue_style(
+			'weatherblock-editor-style',
+			plugins_url( 'build/index.css', __FILE__ ),
+			array(),
+			filemtime( plugin_dir_path( __FILE__ ) . 'build/index.css' )
+		);
+	}
+}
+add_action( 'enqueue_block_editor_assets', 'weatherblock_admin_conditional_assets' );
 
 function weatherblock_register_rest_routes() {
 	register_rest_route(
@@ -274,7 +371,7 @@ function weatherblock_register_rest_routes() {
 add_action( 'rest_api_init', 'weatherblock_register_rest_routes' );
 
 /**
- * Callback de API REST: Usa la función helper centralizada.
+ * Callback for API REST: Uses the central helper function.
  */
 function weatherblock_get_weather_rest( $request ) {
 	$city = $request->get_param( 'city' );
@@ -291,16 +388,16 @@ function weatherblock_get_weather_rest( $request ) {
 }
 
 /**
- * Renderizado del Widget: Usa la función helper centralizada.
+ * Render the widget: Uses the central helper function.
  */
 function render_weather_widget( $attributes, $content, $block ) {
 	$cityname = isset($attributes['cityName']) ? $attributes['cityName'] : 'managua';
 	
-	// Llamada a la lógica centralizada
+	// Call the central logic
 	$data = weatherblock_fetch_from_api( $cityname );
 
 	if ( is_wp_error( $data ) ) {
-		return '<p>' . sprintf( __( 'Datos del clima no disponibles: %s', 'weatherblock' ), esc_html( $data->get_error_message() ) ) . '</p>';
+		return '<p>' . sprintf( __( 'Weather data not available: %s', 'weatherblock' ), esc_html( $data->get_error_message() ) ) . '</p>';
 	}
 
 	ob_start();

@@ -12,8 +12,8 @@
 			"type": "string",
 			"default": "managua"
 		},
-		"background_color": { 
-			"type": "string", 
+		"background_color": {
+			"type": "string",
 			"default": "#cdcdcd"
 		},
 		"autoRefresh": {
