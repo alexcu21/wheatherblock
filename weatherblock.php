@@ -22,11 +22,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 // ==========================================
 
 /**
- * Función auxiliar para obtener datos del clima.
- * Centraliza la lógica para Block Bindings, API REST y el renderizado del bloque.
+ * Helper function to get weather data from the API.
+ * Centralizes the logic for Block Bindings, API REST and block rendering.
  *
- * @param string $city El nombre de la ciudad.
- * @return array|WP_Error Array con datos del clima o WP_Error.
+ * @param string $city The name of the city.
+ * @return array|WP_Error Array with weather data or WP_Error.
  */
 function weatherblock_fetch_from_api( $city ) {
     $api_key = get_option( 'weatherblock_api_key', '' );
@@ -36,7 +36,7 @@ function weatherblock_fetch_from_api( $city ) {
     }
 
     $url      = 'https://api.openweathermap.org/data/2.5/weather';
-    // Se añade units=imperial para consistencia (Fahrenheit)
+    // units=imperial is added for consistency (Fahrenheit)
     $full_url = $url . '?q=' . urlencode( $city ) . '&appid=' . $api_key . '&units=imperial';
     
     $response = wp_remote_get( $full_url );
@@ -58,7 +58,7 @@ function weatherblock_fetch_from_api( $city ) {
 
     return array(
         'city'        => $data->name,
-        'temperature' => $data->main->temp, // Generalmente Fahrenheit debido a units=imperial
+        'temperature' => $data->main->temp, // Generally Fahrenheit due to units=imperial
         'description' => $data->weather[0]->description,
         'humidity'    => $data->main->humidity,
         'wind_speed'  => $data->wind->speed,
@@ -195,10 +195,10 @@ add_action( 'init', 'weatherblock_register_bindings_sources' );
  * Callback de Block Binding: Usa la función helper centralizada.
  */
 function weatherblock_get_weather_data_binding( $source_args, $block_instance ) {
-    // Lógica para determinar la ciudad desde el contexto o argumentos
+    // Logic to determine the city from the context or arguments
     $city_name = isset( $source_args['city'] ) ? $source_args['city'] : 'managua';
     
-    // Llamada a la lógica centralizada
+    // Call to centralized logic
     $data = weatherblock_fetch_from_api( $city_name );
 
     if ( is_wp_error( $data ) ) {
@@ -223,7 +223,7 @@ function weatherblock_get_city_name_binding( $source_args, $block_instance ) {
 }
 
 // ==========================================
-// 4. API REST & INICIALIZACIÓN DEL BLOQUE
+// 4. API REST & BLOCK INITIALIZATION
 // ==========================================
 
 function create_block_weatherblock_block_init() {
@@ -256,7 +256,7 @@ function weatherblock_register_rest_routes() {
 add_action( 'rest_api_init', 'weatherblock_register_rest_routes' );
 
 /**
- * Callback de API REST: Usa la función helper centralizada.
+ * REST API Callback: Uses the centralized helper function.
  */
 function weatherblock_get_weather_rest( $request ) {
     $city = $request->get_param( 'city' );
@@ -273,16 +273,16 @@ function weatherblock_get_weather_rest( $request ) {
 }
 
 /**
- * Renderizado del Widget: Usa la función helper centralizada.
+ * Widget Rendering: Uses the centralized helper function.
  */
 function render_weather_widget( $attributes, $content, $block ) {
     $cityname = isset($attributes['cityName']) ? $attributes['cityName'] : 'managua';
     
-    // Llamada a la lógica centralizada
+    // Call to centralized logic
     $data = weatherblock_fetch_from_api( $cityname );
 
     if ( is_wp_error( $data ) ) {
-        return '<p>Datos del clima no disponibles: ' . esc_html( $data->get_error_message() ) . '</p>';
+        return '<p>Weather data not available: ' . esc_html( $data->get_error_message() ) . '</p>';
     }
 
     ob_start();
